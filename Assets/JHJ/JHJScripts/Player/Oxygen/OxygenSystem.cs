@@ -6,9 +6,9 @@ namespace JHJ.Scripts.Player.Oxygen
 {
     /// <summary>
     /// 플레이어의 산소 수치를 관리하는 컴포넌트.
-    /// 물에 들어가면 감소, 나오면 회복. 기본 수치는 OxygenData에서 가져오고,
-    /// 스킬트리 업그레이드 등은 AddModifier/RemoveModifier로 나중에 얼마든지 끼워넣을 수 있음
-    /// (이 클래스 내부 계산 로직은 건드릴 필요 없음).
+    /// 물(머리)에 들어가면 감소하고, 물 밖으로 나오는 즉시 100% 회복됨.
+    /// 기본 수치는 OxygenData에서 가져오고, 스킬트리 업그레이드 등은
+    /// AddModifier/RemoveModifier로 나중에 얼마든지 끼워넣을 수 있음.
     /// </summary>
     public class OxygenSystem : MonoBehaviour, IOxygenAffectable
     {
@@ -35,22 +35,12 @@ namespace JHJ.Scripts.Player.Oxygen
 
         private void Update()
         {
-            if (data == null) return;
+            if (data == null || !IsInWater) return;
 
             float previousOxygen = CurrentOxygen;
 
-            if (IsInWater)
-            {
-                float depletionRate = data.depletionRatePerSecond * GetDepletionMultiplier();
-                CurrentOxygen -= depletionRate * Time.deltaTime;
-                Debug.Log($"[OxygenSystem] 감소 중: {CurrentOxygen:F1} / {EffectiveMaxOxygen:F1} (rate={depletionRate})");
-            }
-            else if (CurrentOxygen < EffectiveMaxOxygen)
-            {
-                float regenRate = data.regenRatePerSecond + GetRegenFlatBonus();
-                CurrentOxygen += regenRate * Time.deltaTime;
-            }
-
+            float depletionRate = data.depletionRatePerSecond * GetDepletionMultiplier();
+            CurrentOxygen -= depletionRate * Time.deltaTime;
             CurrentOxygen = Mathf.Clamp(CurrentOxygen, 0f, EffectiveMaxOxygen);
 
             if (!Mathf.Approximately(previousOxygen, CurrentOxygen))
@@ -61,13 +51,9 @@ namespace JHJ.Scripts.Player.Oxygen
                 _depletedEventFired = true;
                 OnOxygenDepleted?.Invoke();
             }
-            else if (CurrentOxygen > 0f)
-            {
-                _depletedEventFired = false;
-            }
         }
 
-        /// <summary>WaterZone이 플레이어가 물에 들어오거나 나갈 때 호출함</summary>
+        /// <summary>WaterZone 감지 컴포넌트가 플레이어 머리가 물에 들어오거나 나갈 때 호출함</summary>
         public void SetInWater(bool isInWater)
         {
             if (IsInWater == isInWater) return;
@@ -75,9 +61,17 @@ namespace JHJ.Scripts.Player.Oxygen
             IsInWater = isInWater;
 
             if (isInWater)
+            {
                 OnEnterWater?.Invoke();
+            }
             else
+            {
+                // 물 밖으로 나오는 즉시 전량 회복
+                CurrentOxygen = EffectiveMaxOxygen;
+                _depletedEventFired = false;
+                OnOxygenChanged?.Invoke(CurrentOxygen, EffectiveMaxOxygen);
                 OnExitWater?.Invoke();
+            }
         }
 
         /// <summary>
@@ -121,17 +115,6 @@ namespace JHJ.Scripts.Player.Oxygen
                     multiplier *= modifier.Value;
             }
             return multiplier;
-        }
-
-        private float GetRegenFlatBonus()
-        {
-            float bonus = 0f;
-            foreach (var modifier in _modifiers.Values)
-            {
-                if (modifier.Type == OxygenModifierType.RegenRateFlat)
-                    bonus += modifier.Value;
-            }
-            return bonus;
         }
     }
 }

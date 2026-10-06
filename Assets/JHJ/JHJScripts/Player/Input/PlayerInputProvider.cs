@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace JHJ.Scripts.Player.Input
 {
@@ -14,11 +14,16 @@ namespace JHJ.Scripts.Player.Input
     {
         [Header("키 설정")]
         [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
+        [SerializeField] private KeyCode descendKey = KeyCode.LeftControl;
+        [SerializeField] private KeyCode interactKey = KeyCode.F;
 
         public Vector2 MoveInput { get; private set; }
         public Vector2 LookInput { get; private set; }
         public bool JumpPressed { get; private set; }
         public bool SprintHeld { get; private set; }
+        public bool AscendHeld { get; private set; }
+        public bool DescendHeld { get; private set; }
+        public bool InteractPressed { get; private set; }
 
         private void Update()
         {
@@ -34,6 +39,9 @@ namespace JHJ.Scripts.Player.Input
 
             JumpPressed = UnityEngine.Input.GetButtonDown("Jump");
             SprintHeld = UnityEngine.Input.GetKey(sprintKey);
+            AscendHeld = UnityEngine.Input.GetButton("Jump");
+            DescendHeld = UnityEngine.Input.GetKey(descendKey);
+            InteractPressed = UnityEngine.Input.GetKeyDown(interactKey);
         }
     }
 }

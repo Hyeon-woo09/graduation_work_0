@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace JHJ.Scripts.Player.Input
 {
@@ -21,5 +21,14 @@ namespace JHJ.Scripts.Player.Input
 
         /// <summary>달리기 키가 눌려있는지 (누르고 있는 동안 계속 true)</summary>
         bool SprintHeld { get; }
+
+        /// <summary>수영 중 위로 뜨는 키가 눌려있는지 (누르고 있는 동안 계속 true)</summary>
+        bool AscendHeld { get; }
+
+        /// <summary>수영 중 아래로 잠수하는 키가 눌려있는지 (누르고 있는 동안 계속 true)</summary>
+        bool DescendHeld { get; }
+
+        /// <summary>상호작용(채집 등) 키가 이번 프레임에 눌렸는지</summary>
+        bool InteractPressed { get; }
     }
 }

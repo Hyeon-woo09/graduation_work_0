@@ -15,7 +15,9 @@ MonoBehaviour:
   walkSpeed: 4
   sprintMultiplier: 1.6
   acceleration: 12
-  jumpHeight: 1.2
+  jumpHeight: 3
   gravity: -20
+  swimSpeed: 14
+  swimVerticalSpeed: 18
   lookSensitivity: 2
   maxLookAngle: 85

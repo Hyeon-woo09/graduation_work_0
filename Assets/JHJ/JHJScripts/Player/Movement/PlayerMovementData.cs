@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace JHJ.Scripts.Player.Movement
 {
@@ -19,6 +19,10 @@ namespace JHJ.Scripts.Player.Movement
         [Header("점프 / 중력")]
         public float jumpHeight = 1.2f;
         public float gravity = -20f;
+
+        [Header("수영")]
+        public float swimSpeed = 2.5f;
+        public float swimVerticalSpeed = 2f;
 
         [Header("시점 회전 (마우스 감도)")]
         public float lookSensitivity = 2f;
